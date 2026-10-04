@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Review Highlight Preview — Fictional Example</title>
+  <style>
+    :root { color-scheme: light; --ink:#172f2b; --muted:#576b67; --orange:#b74c22; --blue:#247999; }
+    * { box-sizing:border-box; }
+    html { scroll-padding-top:55px; }
+    body { margin:0; padding:52px 28px 140px; background:#f4f2eb; color:var(--ink); font:17px/1.7 system-ui,sans-serif; }
+    main { max-width:760px; margin:auto; }
+    .eyebrow { margin:0; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+    h1 { margin:12px 0 16px; font-size:clamp(30px,5vw,44px); line-height:1.12; letter-spacing:-.035em; }
+    .intro { max-width:620px; color:var(--muted); }
+    h2 { margin:0 0 20px; font-size:23px; }
+    h3 { margin:28px 0 8px; font-size:17px; }
+    p { margin:0 0 18px; }
+    article { margin:56px 0 32px; padding:28px; background:white; }
+    .review-box { position:relative; outline:2px solid var(--orange); outline-offset:8px; border-radius:0; scroll-margin-top:70px; }
+    .review-box::before { content:attr(data-review); position:absolute; top:-31px; left:-10px; min-width:23px; padding:0 4px; background:var(--orange); color:white; font:700 12px/23px system-ui,sans-serif; text-align:center; }
+    .review-group { outline-color:var(--blue); }
+    .review-group::before { background:var(--blue); }
+    p.review-box { margin-top:36px; margin-bottom:28px; }
+    .note { color:var(--muted); font-size:14px; }
+    .review-nav { position:fixed; bottom:16px; right:16px; z-index:10; display:flex; flex-wrap:wrap; gap:8px; align-items:center; max-width:calc(100vw - 32px); padding:10px 14px; border:1px solid var(--ink); background:#fffdf7; box-shadow:0 4px 20px #172f2b16; font-size:13px; }
+    .review-nav a { padding:3px 11px; border:1px solid var(--muted); color:var(--ink); text-decoration:none; }
+    .review-nav a:hover,.review-nav a:focus-visible { background:var(--ink); color:white; outline:2px solid var(--blue); outline-offset:2px; }
+    @media(max-width:480px) { body { padding:36px 22px 140px; } article { padding:20px; } .review-nav { left:16px; right:16px; } }
+    @media(prefers-reduced-motion:no-preference) { html { scroll-behavior:smooth; } }
+    @media print { body { padding:0; background:white; } article { padding:16px; } .review-box { outline:none !important; } .review-box::before,.review-nav { display:none !important; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="eyebrow">Claude Code + Codex / Review Highlight Preview</p>
+    <h1>Point to the passage.<br>Keep the original.</h1>
+    <p class="intro">A fictional project note with temporary review marks. Orange identifies a passage; blue marks a section to discuss as a whole.</p>
+  </header>
+  <article class="review-box review-group" id="review-3" data-review="3" aria-label="Finding 3: section structure">
+    <h2>Project note: a shared reading list</h2>
+    <p>Our team kept book suggestions in several chat threads. I put them in one reading list so we could find them again.</p>
+    <h3>First draft</h3>
+    <p class="review-box" id="review-1" data-review="1">I leveraged a holistic knowledge-sharing framework to drive meaningful collaboration.</p>
+    <p class="note">Finding 1 — Discuss which concrete action this sentence should describe.</p>
+    <h3>What happened</h3>
+    <p>I added a title, a short note, and a link for each book. Two teammates tried the list and asked for a way to mark what they had already read.</p>
+    <p class="review-box" id="review-2" data-review="2">The list significantly improved team productivity.</p>
+    <p class="note">Finding 2 — Check the evidence before claiming an improvement.</p>
+  </article>
+  <p class="note">Finding 3 — Review the order of the draft, the actions, and the outcome. The marks identify discussion points; they do not apply edits.</p>
+</main>
+<nav class="review-nav" aria-label="Review navigation">
+  <span>Review highlights</span>
+  <a href="#review-1" aria-label="Go to finding 1">1</a>
+  <a href="#review-2" aria-label="Go to finding 2">2</a>
+  <a href="#review-3" aria-label="Go to finding 3">3</a>
+</nav>
+</body>
+</html>
