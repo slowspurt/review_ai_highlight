@@ -39,20 +39,32 @@ Relative/root-relative styles, images, and links retain their paths under the ne
 }
 ```
 
-`language` is `en` (default) or `ko`. Write `reason` in the user's language. With `ko`, the controls read **원본에서 갱신**, **표시 제거**, and **검토 이유와 상태**; use those visible labels when explaining the workflow. Each finding has a stable integer `id` (1–9999), a CSS `selector`, exact `quote`, and a concise `reason`. `kind` is `passage` (orange, default) or `group` (blue). Maximum 100 findings.
+`language` is `en` (default) or `ko`. Write `reason` in the user's language. With `ko`, the controls read **원본에서 갱신**, **표시 제거**, and **번호별 검토·수정**; use those visible labels when explaining the workflow. Each finding has a stable integer `id` (1–9999), a CSS `selector`, exact `quote`, and a concise `reason`. `kind` is `passage` (orange, default) or `group` (blue). Maximum 100 findings.
 
 The selector must match **one existing element**. Prefer stable IDs or semantic context over positional selectors. Do not add IDs to the source just to mark it. The quote must occur **exactly once within that element** after whitespace normalization. Case, punctuation, and words must still match. Inline markup such as `shared <em>reading</em> list` is supported. Use visible text, not HTML entities: `&`, not `&amp;`. For a group, use a unique identifying quote within the selected region (typically its heading); the whole element receives a blue outline.
 
 No fuzzy match, first-occurrence fallback, or numeric occurrence index is used. Missing, repeated, invalid, nonunique, or hidden targets are withheld with a status in the navigation panel. Narrow the selector or re-examine the current source before updating a finding; do not silently redirect it to a different passage. A group anchor confirms identity, not that every sentence in the group is unchanged.
 
+## Requested revisions
+
+Add `"replacement": "Proposed wording."` to an existing finding only when the user requests it. Keep `quote` as the exact ORIGINAL passage. On load, the runtime validates the original match before changing visible text in that location. Revised passages have green outlines and a revision status. An empty replacement previews deletion; omit the field to leave that passage unchanged.
+
+**Findings and revisions** includes a labeled textarea and **Preview #N** for each passage. Users can enter text directly or send numbered instructions to their agent. **Show original / Show revisions** switches between the original DOM text and the current proposals without writing files. The Korean labels are **수정 문구 #N**, **미리보기 #N**, **원문 보기**, and **수정안 보기**.
+
+Field edits are in-memory only, are not sent to the server, and are discarded by refresh/navigation. Store chat-requested proposals in the private JSON for persistence. No POST endpoint or source-saving browser control exists. **Remove** opens the original source, removing both revisions and marks. Printing prints the currently displayed wording with annotations hidden; choose **Show original** first to print the original wording.
+
+Replacement strings are plain text, never HTML. Revisions change only matched text-node portions; elements, attributes, links elsewhere, and all source-file bytes remain intact. A replacement inherits the first matched text node's typography. Emphasis inside the old phrase is not mapped onto new words; original inline formatting is restored exactly in original mode. If preserving emphasis within the revision matters, use a deliberately edited temporary HTML copy with the host's file tools instead.
+
+Groups, links/interactive content, and ranges crossing blocks or explicit `<br>` breaks are withheld from this plain-text revision mechanism. Keep reviewing them and prepare a structured temporary copy when requested. Missing or ambiguous original quotes are never replaced. Overlapping requested revisions are both withheld; nonoverlapping revisions, including two in one text node, can be previewed together.
+
 ## Edit, refresh, remove
 
-1. Open the printed review URL. Numbers jump to passages; **Findings and status** explains each mark and any withheld target.
+1. Open the printed review URL. Numbers jump to passages; **Findings and revisions** explains each mark and any withheld target.
 2. After the user edits and saves the original HTML, choose **Refresh source**. This reloads both source and findings from disk. There is no file watcher or automatic rewrite.
 3. If the old quote changed, its mark disappears. Re-read the revision, then update or remove the finding only as appropriate to the user's request. Keep IDs of surviving findings.
 4. **Remove** reloads the same source at `?review=off`, with no overlay script. Reloading that URL remains unannotated. Open the original printed review URL to restore annotations. Ctrl+C stops only this preview server.
 
-The overlay uses DOM ranges and a separate shadow-root layer, without wrapping source text or changing source styles. It follows scrolling and resizing and is hidden by print CSS. It never writes the source. Refresh also rereads external static assets with caching disabled by this server.
+The overlay uses DOM ranges and a separate shadow-root layer, without wrapping source elements or changing source styles. Requested revisions temporarily change only the matched DOM text It follows scrolling and resizing and is hidden by print CSS. It never writes the source. Refresh also rereads external static assets with caching disabled by this server.
 
 ## Boundaries and troubleshooting
 

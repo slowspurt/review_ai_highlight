@@ -125,6 +125,77 @@ const {once} = require('node:events');
     await page.getByRole('button',{name:'원본에서 갱신',exact:true}).click();
     await page.getByRole('button',{name:'검토 위치로 이동 1',exact:true}).waitFor();
     assert.equal(await page.getByRole('button',{name:'검토 위치로 이동 1',exact:true}).isDisabled(),true);
+    // Opt-in revision previews: persisted numbered proposals plus direct field edits.
+    const revisionHtml=html.replace('</main>', '<p id="pair">First thought. Second thought.</p></main>');
+    await fs.writeFile(source,revisionHtml);
+    const revisions={language:'ko',findings:[
+      {...item(1,'#draft',data.findings[0].quote),quote:"By bringing the team's recommendations into a shared space that connected individual interests with the wider reading process, I made the list part of how we exchanged ideas.",replacement:'I created a shared reading list.'},
+      {...item(2,'#inline','A shared reading list & notes.'),replacement:'<img src=x onerror=alert(1)> is plain text.'},
+      item(3,'#korean','함께 읽는 목록입니다.'),
+      {...item(4,'#link','Open another page'),replacement:'Changed link'},
+      {...item(5,'#blocks','First. Second.'),replacement:'Changed blocks'},
+      {...item(7,'#pair','First thought.'),replacement:'A much longer first thought.'},
+      {...item(8,'#pair','Second thought.'),replacement:'Second.'},
+      {...item(9,'#missing','Not here'),replacement:'Must never appear'},
+      {...item(10,'#project','Our project','group'),replacement:'Must not erase this section'}
+    ]};
+    await fs.writeFile(manifest,JSON.stringify(revisions));
+    await page.goto(url+'?review=off');
+    const revisionBaseline=await page.locator('body').innerHTML();
+    await page.goto(url);
+    await page.getByRole('button',{name:'원문 보기',exact:true}).waitFor();
+    assert.equal(await page.locator('#draft').textContent(),'I created a shared reading list.');
+    assert.equal(await page.locator('#inline').textContent(),revisions.findings[1].replacement);
+    assert.equal(await page.locator('#inline img').count(),0,'Replacement never executes as HTML');
+    assert.equal(await page.locator('#link').textContent(),'Open another page');
+    assert.equal(await page.locator('#link').getAttribute('href'),'next.html#destination');
+    assert.equal(await page.locator('#blocks').textContent(),'First.Second.');
+    assert.equal(await page.locator('#pair').textContent(),'A much longer first thought. Second.');
+    assert.equal(await page.locator('.box.revised').count()>0,true);
+    assert.equal(await page.locator('body').getByText('Must never appear',{exact:true}).count(),0);
+    const sameNodeAligned=await page.locator('review-highlight-preview').evaluate(el=>{
+      const node=document.querySelector('#pair').firstChild;
+      const range=document.createRange();const start=node.data.indexOf('Second.');
+      range.setStart(node,start);range.setEnd(node,start+7);
+      const r=range.getClientRects()[0];const b=el.shadowRoot.querySelector('[data-finding="8"]').getBoundingClientRect();
+      return Math.abs(r.left-b.left-3)<1 && Math.abs(r.top-b.top-2)<1;
+    });
+    assert(sameNodeAligned,'Multiple revisions in one text node retain exact annotation offsets');
+    await page.getByLabel('수정 문구 #1',{exact:true}).fill('책마다 제목과 메모를 한 목록에 정리했습니다.');
+    await page.getByRole('button',{name:'미리보기 #1',exact:true}).click();
+    assert.equal(await page.locator('#draft').textContent(),'책마다 제목과 메모를 한 목록에 정리했습니다.');
+    for(let pass=0;pass<3;pass++) {
+      await page.getByRole('button',{name:'원문 보기',exact:true}).click();
+      assert.equal(await page.locator('body').innerHTML(),revisionBaseline,'Original mode restores exact DOM including inline formatting');
+      await page.getByRole('button',{name:'수정안 보기',exact:true}).click();
+    }
+    await page.getByLabel('수정 문구 #3',{exact:true}).fill('');
+    await page.getByRole('button',{name:'미리보기 #3',exact:true}).click();
+    assert.equal(await page.locator('#korean').textContent(),'','Empty replacement previews deletion');
+    assert.equal(await fs.readFile(source,'utf8'),revisionHtml,'Preview never saves source');
+    assert.equal(JSON.parse(await fs.readFile(manifest,'utf8')).findings[0].replacement,'I created a shared reading list.','UI edits are tab-local');
+    await page.getByRole('button',{name:'원본에서 갱신',exact:true}).click();
+    await page.getByRole('button',{name:'원문 보기',exact:true}).waitFor();
+    assert.equal(await page.locator('#draft').textContent(),'I created a shared reading list.','Refresh uses persisted manifest, not lost field state');
+    // Revisions are withheld if their ORIGINAL quotes become stale or duplicate.
+    await fs.writeFile(source,revisionHtml.replace('First thought.','First thought. First thought.'));
+    await page.getByRole('button',{name:'원본에서 갱신',exact:true}).click();
+    await page.getByRole('button',{name:'원문 보기',exact:true}).waitFor();
+    assert.equal(await page.locator('#pair').textContent(),'First thought. First thought. Second.');
+    assert.equal(await page.getByRole('button',{name:'검토 위치로 이동 7',exact:true}).isEnabled(),false);
+    // Overlap prevents both requested changes, rather than applying a partial order.
+    revisions.findings.push({...item(11,'#draft',"the team's recommendations"),replacement:'Overlapping edit'});
+    await fs.writeFile(manifest,JSON.stringify(revisions));
+    await page.getByRole('button',{name:'원본에서 갱신',exact:true}).click();
+    await page.getByRole('button',{name:'원문 보기',exact:true}).waitFor();
+    assert((await page.locator('#draft').textContent()).startsWith("By bringing the team's recommendations"));
+    assert((await state()).statuses.some(text=>text.includes('수정 범위가 겹칩니다')));
+    await page.getByRole('button',{name:'표시 제거',exact:true}).click();
+    await page.waitForURL('**?review=off');
+    assert.equal(await page.locator('review-highlight-preview').count(),0);
+    assert.equal(await page.locator('#pair').textContent(),'First thought. First thought. Second thought.');
+    await page.goto(url);
+    await page.getByRole('button',{name:'원문 보기',exact:true}).waitFor();
     await fs.writeFile(manifest,'{');
     await page.getByRole('button',{name:'원본에서 갱신',exact:true}).click();
     await page.getByText('Cannot load findings. Fix the file and refresh.').waitFor();
@@ -138,7 +209,7 @@ const {once} = require('node:events');
     await page.waitForURL('**/next.html#destination');
     assert.equal(await page.locator('#destination').textContent(),'Another page');
     assert.deepEqual(errors,[]);
-    console.log('PASS: preservation, assets/links, exact/scoped matching, inline markup, whitespace/BR/blocks, Korean, missing/duplicate/hidden/invalid targets, resize, navigation, print, edit/refresh, invalid manifest, removal.');
+    console.log('PASS: preservation, assets/links, exact/scoped matching, inline markup, whitespace/BR/blocks, Korean, missing/duplicate/hidden/invalid targets, resize, navigation, print, edit/refresh, invalid manifest, removal, numbered revision previews, literal input, exact original restoration, overlap protection.');
   } finally {
     if(browser) await browser.close();
     server.kill('SIGINT');

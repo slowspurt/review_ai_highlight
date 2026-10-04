@@ -1,6 +1,6 @@
 ---
 name: review-highlight-preview
-description: Highlight hard-to-follow passages directly in a local HTML page so the user can find where polished AI-assisted writing needs attention. Use when chat feedback is hard to locate or the user asks to see which parts need revision. Preserve wording and layout; do not automatically rewrite or detect AI authorship. Shared runtime for Claude Code and Codex.
+description: Highlight hard-to-follow passages directly in a local HTML page so the user can find where polished AI-assisted writing needs attention. Use when chat feedback is hard to locate or the user asks to see which parts need revision. Preserve the source; preview requested revisions in place by finding number, without unsolicited rewriting or AI-authorship detection. Shared runtime for Claude Code and Codex.
 license: MIT
 ---
 
@@ -23,6 +23,16 @@ Help the user see where reading breaks down in the page they are editing. A poli
 3. Run the bundled `scripts/preview.py` using its absolute installed path, the source, and the findings file. Use the smallest appropriate static asset root and an unused loopback port. Reuse a server from this review when possible; do not wrap another preview server or disturb unrelated servers/tabs.
 4. Open the printed local review URL in a new tab/panel. In Codex desktop use the available browser/open-panel tool; in Claude Code use an available browser integration or provide the URL. The server serves a new local origin; the source and original live tab remain unchanged. No paid API or plugin installation is required.
 5. Verify actual outlines, numbering, navigation, line wrapping, relative assets, links, and any withheld targets. Capture only suitable review material. If no browser tool is available, check HTTP responses and state that visual placement is unverified. Keep the review available for the user; check the runtime reference on short-lived terminal sessions if the host reaps background processes.
+
+## Preview requested revisions by number
+
+When the user asks to revise or see a proposed edit, use the existing finding numbers. Accept simple instructions such as “Change #1 to …”, “Make #2 shorter”, or several numbered lines. Use supplied wording exactly; when asked to propose wording, draft only for the requested numbers and preserve meaning and factual claims. Do not add findings or invent facts. Ask only when the number or intended scope is ambiguous.
+
+Put each requested plain-text proposal in that finding's optional `replacement` field. Keep `quote` anchored to the original text and keep its `id`, selector, and reason. Refresh the preview to show the changed words **in their original location**, with green outlines. Do not overwrite `quote` with the proposal just to make it match. Use the runtime reference for overlap/markup limits.
+
+The page also has numbered replacement fields under **Findings and revisions** and a **Preview #N** button. **Show original / Show revisions** compares the two states. In Korean these are **수정 문구 #N**, **미리보기 #N**, **원문 보기 / 수정안 보기**. Explain that browser field edits last only in that tab; refresh reloads the JSON. Chat-driven proposals saved in the private JSON survive refresh.
+
+After showing findings, briefly invite the user to say “Change #1 to …” or “Suggest a shorter version of #2” so they know they can revise by number. Do not generate proposals before a request. A request to preview a revision authorizes this temporary view, not a source-file write. When the user explicitly asks to save a chosen revision to the original, edit the actual source with the host's file tools, preserve links/markup deliberately, then update or retire the affected findings and verify the result. The browser controls never save source files.
 
 ## Continue or finish
 

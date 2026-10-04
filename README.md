@@ -23,7 +23,7 @@ This skill puts the highlight **at that exact location on the working page**, wi
 
 Orange outlines mark passages; blue outlines mark broader sections. Highlights live in a temporary local preview and disappear when printing. The source stays unchanged.
 
-The skill provides a **shared local runtime** for Claude Code and Codex. The agent chooses the passages and explains the reading difficulty; reusable code draws outlines, numbers, and navigation. It does not automatically rewrite text or detect AI authorship. A highlight is a point to discuss, not a verdict.
+The skill provides a **shared local runtime** for Claude Code and Codex. The agent chooses the passages and explains the reading difficulty; reusable code draws outlines, numbers, and navigation. It previews revisions in place when you ask, and accepts changes by finding number. It does not rewrite unsolicited passages or detect AI authorship. A highlight is a point to discuss, not a verdict.
 
 Requirements: **Python 3.10+, Git for installation, and a modern browser with JavaScript**. The preview uses only the Python standard library and browser APIs. No separate paid API, Python package, or browser plugin is required. Your normal agent account is separate from this local runtime.
 
@@ -70,7 +70,7 @@ Installation paths and invocation syntax follow the official [Claude Code skills
 ## Use it on your page
 
 1. Give the agent your **local HTML path** and the passages already discussed. If you want a new readability review, ask for one explicitly.
-2. The agent creates a private findings file and starts the bundled server. Open the local URL it provides; use the numbered buttons to find each passage and expand **Findings and status** for reasons.
+2. The agent creates a private findings file and starts the bundled server. Open the local URL it provides; use the numbered buttons to find each passage and expand **Findings and revisions** for reasons.
 3. Edit and save your original HTML as usual. Click **Refresh source** to reread the latest source and findings. If a quote changed, disappeared, or became ambiguous, the mark is withheld with an explanation.
 4. Ask the agent to re-examine changed findings when needed. It does not automatically move a mark to a similar sentence.
 5. Click **Remove** for the unannotated page. Stop this preview server with Ctrl+C when finished. Your source never contains the annotations.
@@ -78,6 +78,23 @@ Installation paths and invocation syntax follow the official [Claude Code skills
 If you already discussed the findings, ask: “Show only the passages we discussed on this page. Keep their numbers; do not add findings.” This locates the existing feedback without starting another review.
 
 In Codex desktop the agent can open the preview beside the chat. In Claude Code it can provide the URL or use a browser integration you already have. Without a browser tool, it must say that visual placement is unverified. The toolbar supports English and Korean; reasons follow the user's language.
+
+## Ask for revisions by number
+
+After seeing the highlights, just tell the agent:
+
+```text
+Change #1 to "I collected the book recommendations in one shared list."
+Suggest a shorter version of #2 and show it in place.
+```
+
+The new wording appears at the original location, with a green outline. **Show original / Show revisions** lets you compare the versions. You can also expand **Findings and revisions**, type in **Replacement for #1**, and click **Preview #1** yourself. Multiple numbered changes work together when their ranges do not overlap.
+
+These are previews: your original file stays unchanged. Browser field edits last only in the current tab; refresh discards them. Proposals supplied through chat can be saved in the private findings JSON. Tell the agent to save a chosen revision to the source when you are ready. **Remove** returns to the original wording.
+
+For a fictional revision example, run the example command below with `--findings examples/revisions.json`. Plain-text revisions preserve surrounding layout but do not remap inline emphasis to new words. Links, entire groups, and multiple-block replacements are withheld; see the [runtime limits](references/runtime.md#requested-revisions).
+
+![Requested wording previewed in its original location](examples/revision-preview.png)
 
 ## Try it without an agent
 

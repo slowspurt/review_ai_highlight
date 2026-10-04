@@ -1,0 +1,26 @@
+{
+  "language": "en",
+  "findings": [
+    {
+      "id": 1,
+      "selector": "#approach",
+      "quote": "By bringing the team's recommendations into a shared space that connected individual interests with the wider reading process, I made the list part of how we exchanged ideas.",
+      "reason": "What did I actually make? Several abstract ideas arrive before the reader can picture the work.",
+      "replacement": "I collected the book recommendations in one shared list, with a title, a note, and a link for each book."
+    },
+    {
+      "id": 2,
+      "selector": "#reflection",
+      "quote": "This experience reinforced the importance of creating a shared space where recommendations could be brought together and made available to the team.",
+      "reason": "This repeats the opening. Does it add anything the reader needs?",
+      "replacement": "A next step would be letting teammates mark books they have read."
+    },
+    {
+      "id": 3,
+      "selector": "#project",
+      "quote": "Project note: a shared reading list",
+      "kind": "group",
+      "reason": "The concrete work appears after the abstract explanation. Consider whether the order helps the reader."
+    }
+  ]
+}

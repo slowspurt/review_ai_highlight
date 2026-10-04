@@ -111,6 +111,17 @@ class PreviewTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 preview.resolve_source(value, root)
 
+    def test_replacement_schema(self):
+        for replacement in ("New wording", "", "<script>literal text</script>"):
+            self.data["findings"][0]["replacement"] = replacement
+            self.manifest.write_text(json.dumps(self.data))
+            self.assertEqual(preview.load_findings(self.manifest)["findings"][0]["replacement"], replacement)
+        for replacement in (None, 12, {}, []):
+            self.data["findings"][0]["replacement"] = replacement
+            self.manifest.write_text(json.dumps(self.data))
+            with self.assertRaises(ValueError):
+                preview.load_findings(self.manifest)
+
 
 if __name__ == "__main__":
     unittest.main()

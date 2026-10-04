@@ -22,7 +22,7 @@ def load_findings(path):
         raise ValueError("findings must be an array with at most 100 entries")
     ids = set()
     for item in findings:
-        if not isinstance(item, dict) or set(item) - {"id", "selector", "quote", "reason", "kind"}:
+        if not isinstance(item, dict) or set(item) - {"id", "selector", "quote", "reason", "kind", "replacement"}:
             raise ValueError("Unknown finding fields")
         number = item.get("id")
         if type(number) is not int or number < 1 or number > 9999 or number in ids:
@@ -33,6 +33,8 @@ def load_findings(path):
                 raise ValueError(f"Finding {number}: {key} must be a nonempty string")
         if item.get("kind", "passage") not in ("passage", "group"):
             raise ValueError("kind must be passage or group")
+        if "replacement" in item and not isinstance(item["replacement"], str):
+            raise ValueError("replacement must be plain text (an empty string previews deletion)")
     return data
 
 
