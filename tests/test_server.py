@@ -43,6 +43,7 @@ class PreviewTest(unittest.TestCase):
         with self.assertRaises(HTTPError) as caught:
             self.request(path)
         self.assertEqual(caught.exception.code, code)
+        caught.exception.close()
 
     def test_response_only_refresh_and_remove(self):
         with urlopen(self.url) as response:
@@ -74,6 +75,7 @@ class PreviewTest(unittest.TestCase):
         with self.assertRaises(HTTPError) as caught:
             urlopen(Request(self.url, headers={"Host":"external.invalid"}))
         self.assertEqual(caught.exception.code, 403)
+        caught.exception.close()
 
     def test_manifest_reload_and_errors(self):
         import re

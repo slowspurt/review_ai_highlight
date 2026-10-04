@@ -42,8 +42,8 @@ git clone https://github.com/slowspurt/review_ai_highlight.git \
 Start a Claude Code session and ask (replace the path with your local HTML):
 
 ```text
-/review-highlight-preview Show the passages we discussed in /absolute/path/site/page.html.
-Keep the original wording and layout. Do not add new findings or rewrite anything.
+/review-highlight-preview Review /absolute/path/site/page.html for passages that are hard to follow.
+Show them directly on the page with brief reasons. Keep the wording and layout unchanged.
 ```
 
 ### Codex
@@ -57,9 +57,8 @@ git clone https://github.com/slowspurt/review_ai_highlight.git \
 Start a Codex session and ask:
 
 ```text
-Use $review-highlight-preview on /absolute/path/site/page.html.
-Show exactly where the passages we discussed are, with their surrounding text.
-Keep the wording intact and do not add new findings.
+Use $review-highlight-preview to review /absolute/path/site/page.html for passages that are hard to follow.
+Show them on the page with brief reasons and surrounding text. Do not rewrite anything.
 ```
 
 If your existing Codex installation already discovers skills in a different directory, such as `$CODEX_HOME/skills`, use that configured directory instead. Avoid installing duplicate copies under multiple discovered paths. Start a new session if the skill does not appear.
@@ -75,6 +74,8 @@ Installation paths and invocation syntax follow the official [Claude Code skills
 3. Edit and save your original HTML as usual. Click **Refresh source** to reread the latest source and findings. If a quote changed, disappeared, or became ambiguous, the mark is withheld with an explanation.
 4. Ask the agent to re-examine changed findings when needed. It does not automatically move a mark to a similar sentence.
 5. Click **Remove** for the unannotated page. Stop this preview server with Ctrl+C when finished. Your source never contains the annotations.
+
+If you already discussed the findings, ask: “Show only the passages we discussed on this page. Keep their numbers; do not add findings.” This locates the existing feedback without starting another review.
 
 In Codex desktop the agent can open the preview beside the chat. In Claude Code it can provide the URL or use a browser integration you already have. Without a browser tool, it must say that visual placement is unverified. The toolbar supports English and Korean; reasons follow the user's language.
 

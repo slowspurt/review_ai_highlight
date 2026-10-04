@@ -20,9 +20,10 @@ Playwright is developer-only tooling. Install it as described in the repository 
 
 Checked on macOS on 2026-10-04:
 
-- Python server tests and the Chromium lifecycle test passed.
+- Python server tests passed on Python 3.10 and 3.14. The Chromium lifecycle test passed, including from a clean Git clone.
 - Skill frontmatter validation passed with the skill-creator validator.
 - Codex desktop: the bundled runtime was used in this implementation session. The fictional page was visually inspected in the in-app browser at its regular width and 375px, including numbered navigation. The published screenshot comes from that runtime.
 - Claude Code 2.1.281: a fresh noninteractive session read the candidate skill and runtime reference, created exactly the requested finding #7 with Korean UI/reason, kept source bytes unchanged, and verified HTML/script/manifest/remove HTTP responses. It correctly left visual placement unverified. The host reaped its background tool server when the session exited; the runtime reference now documents persistent-terminal and detached-launch handling. This candidate check used an explicit skill path rather than automatic discovery.
+- Installed Claude Code skill: after fast-forwarding the personal installation, a second fresh session invoked `/review-highlight-preview`, loaded the installed runtime reference, and produced exactly requested finding #12. A detached launch remained reachable after that session exited. An external check confirmed source SHA-256 preservation and exact unannotated-response bytes. Its generated page was then visually inspected in the Codex browser: only #12 was marked, with Korean controls. This verifies one installed invocation; it does not claim Claude had browser automation.
 
 This does not establish cross-browser/platform compatibility, real production-site compatibility, or support for dynamic frameworks. Print hiding was checked through Chromium's print media emulation, not a physical printer. The automated fixture covers ordinary document scrolling; clipped nested scroll regions and transforms remain outside the supported scope.

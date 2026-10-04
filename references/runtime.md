@@ -39,7 +39,7 @@ Relative/root-relative styles, images, and links retain their paths under the ne
 }
 ```
 
-`language` is `en` (default) or `ko`. Write `reason` in the user's language. Each finding has a stable integer `id` (1–9999), a CSS `selector`, exact `quote`, and a concise `reason`. `kind` is `passage` (orange, default) or `group` (blue). Maximum 100 findings.
+`language` is `en` (default) or `ko`. Write `reason` in the user's language. With `ko`, the controls read **원본에서 갱신**, **표시 제거**, and **검토 이유와 상태**; use those visible labels when explaining the workflow. Each finding has a stable integer `id` (1–9999), a CSS `selector`, exact `quote`, and a concise `reason`. `kind` is `passage` (orange, default) or `group` (blue). Maximum 100 findings.
 
 The selector must match **one existing element**. Prefer stable IDs or semantic context over positional selectors. Do not add IDs to the source just to mark it. The quote must occur **exactly once within that element** after whitespace normalization. Case, punctuation, and words must still match. Inline markup such as `shared <em>reading</em> list` is supported. Use visible text, not HTML entities: `&`, not `&amp;`. For a group, use a unique identifying quote within the selected region (typically its heading); the whole element receives a blue outline.
 
