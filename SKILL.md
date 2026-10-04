@@ -1,12 +1,22 @@
 ---
 name: review-highlight-preview
-description: Add numbered solid-outline review highlights and navigation to a temporary local HTML preview without editing the source. Use when a user wants passages marked visually for discussion. Works with Claude Code and Codex using available local file and browser tools.
+description: Highlight hard-to-follow passages directly in the web page a user is working on, so they can see where to revise polished but unclear AI-assisted writing. Use when chat feedback is hard to locate on the page or the user asks to see which parts need attention. Preserve wording and layout; support the user's editing decisions without automatically rewriting or detecting AI authorship. Works with Claude Code and Codex.
 license: MIT
 ---
 
 # Review Highlight Preview
 
-Add numbered solid outlines to passages in a resume, article, or webpage so the user can see exactly what is being discussed. Keep annotation separate from editing. This skill handles presentation only; use the user's request and project instructions to evaluate the content. Match visible labels and explanations to the user's language and document context.
+Help the user see exactly where reading breaks down in the page they are editing. An AI-assisted draft may look polished yet contain passages that are vague, overloaded, repetitive, or difficult to connect. Explaining those issues only in chat makes the user hunt through the page. Put temporary highlights on the actual passages in the existing web layout, with enough surrounding text to judge them.
+
+The outcome is a shared view of where the user might revise, not an automatic rewrite or an AI-authorship score. Numbers and rectangles support that conversation. Match visible labels and explanations to the user's language and document context.
+
+## What to highlight
+
+- Start with the user's reading difficulties and the findings already discussed. A request to show "where" should locate those findings, not restart the review or invent additional problems.
+- When the user also requests a review, use their writing preferences and project instructions. Identify a concrete reading difficulty: an unclear subject, too many ideas compressed together, repetition without new information, or an unexplained shift between ideas.
+- Highlight the smallest passage that contains the problem; mark a larger section when its order or repetition is the issue. Keep neighboring text and the page design visible.
+- Explain each finding briefly and tie it to its number. Treat it as a judgment the user can accept or reject. Do not label all polished phrasing, technical terms, or regular structure as bad or AI-written.
+- Preserve the author's meaning, voice, and factual claims. Marking a passage does not authorize deletion, rewriting, or applying a proposed correction.
 
 ## Default presentation
 
@@ -18,7 +28,7 @@ Add numbered solid outlines to passages in a resume, article, or webpage so the 
 
 ## Workflow
 
-1. Identify the user's preview tab and source HTML. Locate each target passage or region and associate it with a finding number. Scope repeated phrases to the relevant section.
+1. Identify the page the user is working on, its preview tab, and source HTML. Locate each target passage or region and associate it with a finding number. Scope repeated phrases to the relevant section. Keep the current page's layout rather than extracting the text into a separate report.
 2. Use a local server that reads the source and **adds annotation HTML/CSS only to the response**, or create a review copy in a temporary directory. Bind the server to `127.0.0.1`. Preserve relative asset paths so images and styles continue to load.
 3. Wrap individual passages temporarily and add annotation classes to larger regions. Avoid string replacement across HTML tag boundaries. For simple replacements, verify that each target occurs exactly once. Use elements or text ranges for complex nesting.
 4. Assign IDs such as `review-1` and link to them with `href="#review-1"`. Leave space between outlines and text, and prevent badges from overlapping preceding sentences. Annotations should follow the content as viewport width or zoom changes.

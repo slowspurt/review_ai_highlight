@@ -1,17 +1,29 @@
 # Review Highlight Preview
 
-A small, open-source skill for **Claude Code and Codex**. Turn review findings into numbered outlines on a temporary local HTML preview, so you and your agent can discuss the same passage.
+**See where polished AI-assisted writing becomes hard to read—right on the page you're working on.**
 
-![Fictional document with numbered review highlights](examples/preview.jpg)
+An open-source skill for **Claude Code and Codex** that highlights passages worth revisiting in your working web preview. See the wording in its layout, follow the surrounding paragraph, and decide what you want to change.
+
+## The problem
+
+An AI-assisted draft can look finished and still be difficult to follow. You reread a sentence without knowing what it means, lose the point in a paragraph, or feel that the words sound polished but say very little.
+
+You ask the agent to look at it. It explains the issue in chat. You ask, "Where?" It quotes a sentence or describes a section—and you still have to search the page and match the explanation to the text.
+
+This skill puts the highlight **at that exact location on the working page**, with the surrounding text and design still visible. Numbers connect the conversation to the page; they are a way to find the passage, not the purpose of the tool.
+
+![Hard-to-follow passages highlighted in a fictional working page](examples/preview.jpg)
 
 ## What it does
 
-- Orange outlines identify individual passages; blue outlines identify broader sections.
-- Numbered links jump to the corresponding finding.
-- Original text, links, and source files stay intact.
-- Highlights are added only to a temporary copy or local server response and hidden when printing.
+- Shows the sentence or paragraph being discussed directly in the page's existing layout.
+- Helps you inspect vague wording, overloaded sentences, repetition, or a jump in the explanation in context.
+- Keeps the original wording visible while you decide whether and how to revise it.
+- Connects chat feedback to exact locations with numbered outlines and jump links.
 
-This is an **instruction-only skill**, not a browser extension, MCP server, or AI-text detector. Your agent creates the preview using the tools available in its environment. It does not decide which writing is good or bad: your review criteria stay in control.
+Orange outlines mark passages; blue outlines mark broader sections. Highlights live in a temporary local preview and disappear when printing. The source stays unchanged.
+
+This is an **instruction-only skill** for visual support during human editing. It does not automatically rewrite the text or score whether AI wrote it. AI-assisted writing is the main use case, but the same workflow helps with any passage that is hard to follow. A highlight is a point to discuss, not a verdict. Your agent creates the preview using available local tools; you stay in control of the edit.
 
 ## Install
 
@@ -28,8 +40,9 @@ git clone https://github.com/slowspurt/review_ai_highlight.git \
 Then ask:
 
 ```text
-/review-highlight-preview Mark the passages we discussed in this local HTML document.
-Keep the original unchanged and add numbered navigation.
+/review-highlight-preview This AI-assisted page looks finished, but parts are hard to follow.
+Highlight the passages worth revisiting directly on the page I'm working on.
+Keep the wording intact so I can decide what to change.
 ```
 
 ### Codex
@@ -43,8 +56,9 @@ git clone https://github.com/slowspurt/review_ai_highlight.git \
 Then ask:
 
 ```text
-Use $review-highlight-preview to show these review findings beside the document.
-Keep the source unchanged and preserve the finding numbers.
+Use $review-highlight-preview to show exactly where the passages we discussed are.
+Highlight them in my current web preview, with the surrounding text visible.
+Don't rewrite anything yet.
 ```
 
 If your existing Codex installation already discovers skills in a different directory, such as `$CODEX_HOME/skills`, use that configured directory instead. Avoid installing duplicate copies under multiple discovered paths. Start a new session if the skill does not appear.
@@ -55,10 +69,12 @@ Installation paths and invocation syntax follow the official [Claude Code skills
 
 ## How it works
 
-1. The agent maps review numbers to the passages you want marked.
-2. It creates a temporary HTML copy or serves the original with annotation markup added only to the response.
-3. It adds solid outlines, number badges, and navigation links.
-4. It opens a local preview and checks it when browser access is available.
+1. You point out a reading difficulty, ask for a readability review, or discuss a passage with the agent.
+2. The agent locates the relevant text in the working page. If you have already identified passages, it uses those instead of starting a new review.
+3. It adds temporary outlines in the existing layout and connects them to the discussion with numbers.
+4. You look at the highlighted text in context and decide what to revise. Changes to the writing remain a separate request.
+
+The implementation uses a temporary HTML copy or a local server that adds annotation markup only to its responses. The original page is not replaced by a separate review report.
 
 In Codex desktop, a supported browser panel can show the preview beside the chat. In Claude Code or another terminal environment, the agent can use an existing browser integration or give you the local URL. Browser automation is optional; without it, the agent reports that visual verification remains pending. Visible labels follow your language, even though the skill instructions are in English.
 
