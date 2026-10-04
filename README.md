@@ -12,7 +12,7 @@ You ask the agent to look at it. It explains the issue in chat. You ask, "Where?
 
 This skill puts the highlight **at that exact location on the working page**, with the surrounding text and design still visible. Numbers connect the conversation to the page; they are a way to find the passage, not the purpose of the tool.
 
-![Hard-to-follow passages highlighted in a fictional working page](examples/preview.jpg)
+![Hard-to-follow passages highlighted in a fictional working page](examples/preview.png)
 
 ## What it does
 
@@ -23,7 +23,9 @@ This skill puts the highlight **at that exact location on the working page**, wi
 
 Orange outlines mark passages; blue outlines mark broader sections. Highlights live in a temporary local preview and disappear when printing. The source stays unchanged.
 
-This is an **instruction-only skill** for visual support during human editing. It does not automatically rewrite the text or score whether AI wrote it. AI-assisted writing is the main use case, but the same workflow helps with any passage that is hard to follow. A highlight is a point to discuss, not a verdict. Your agent creates the preview using available local tools; you stay in control of the edit.
+The skill provides a **shared local runtime** for Claude Code and Codex. The agent chooses the passages and explains the reading difficulty; reusable code draws outlines, numbers, and navigation. It does not automatically rewrite text or detect AI authorship. A highlight is a point to discuss, not a verdict.
+
+Requirements: **Python 3.10+, Git for installation, and a modern browser with JavaScript**. The preview uses only the Python standard library and browser APIs. No separate paid API, Python package, or browser plugin is required. Your normal agent account is separate from this local runtime.
 
 ## Install
 
@@ -37,12 +39,11 @@ git clone https://github.com/slowspurt/review_ai_highlight.git \
   "$HOME/.claude/skills/review-highlight-preview"
 ```
 
-Then ask:
+Start a Claude Code session and ask (replace the path with your local HTML):
 
 ```text
-/review-highlight-preview This AI-assisted page looks finished, but parts are hard to follow.
-Highlight the passages worth revisiting directly on the page I'm working on.
-Keep the wording intact so I can decide what to change.
+/review-highlight-preview Show the passages we discussed in /absolute/path/site/page.html.
+Keep the original wording and layout. Do not add new findings or rewrite anything.
 ```
 
 ### Codex
@@ -53,12 +54,12 @@ git clone https://github.com/slowspurt/review_ai_highlight.git \
   "$HOME/.agents/skills/review-highlight-preview"
 ```
 
-Then ask:
+Start a Codex session and ask:
 
 ```text
-Use $review-highlight-preview to show exactly where the passages we discussed are.
-Highlight them in my current web preview, with the surrounding text visible.
-Don't rewrite anything yet.
+Use $review-highlight-preview on /absolute/path/site/page.html.
+Show exactly where the passages we discussed are, with their surrounding text.
+Keep the wording intact and do not add new findings.
 ```
 
 If your existing Codex installation already discovers skills in a different directory, such as `$CODEX_HOME/skills`, use that configured directory instead. Avoid installing duplicate copies under multiple discovered paths. Start a new session if the skill does not appear.
@@ -67,38 +68,75 @@ For project-only installation, use `.claude/skills/review-highlight-preview/` fo
 
 Installation paths and invocation syntax follow the official [Claude Code skills documentation](https://code.claude.com/docs/en/skills) and [Codex skills documentation](https://learn.chatgpt.com/docs/build-skills). Desktop and terminal environments may offer different browser tools.
 
-## How it works
+## Use it on your page
 
-1. You point out a reading difficulty, ask for a readability review, or discuss a passage with the agent.
-2. The agent locates the relevant text in the working page. If you have already identified passages, it uses those instead of starting a new review.
-3. It adds temporary outlines in the existing layout and connects them to the discussion with numbers.
-4. You look at the highlighted text in context and decide what to revise. Changes to the writing remain a separate request.
+1. Give the agent your **local HTML path** and the passages already discussed. If you want a new readability review, ask for one explicitly.
+2. The agent creates a private findings file and starts the bundled server. Open the local URL it provides; use the numbered buttons to find each passage and expand **Findings and status** for reasons.
+3. Edit and save your original HTML as usual. Click **Refresh source** to reread the latest source and findings. If a quote changed, disappeared, or became ambiguous, the mark is withheld with an explanation.
+4. Ask the agent to re-examine changed findings when needed. It does not automatically move a mark to a similar sentence.
+5. Click **Remove** for the unannotated page. Stop this preview server with Ctrl+C when finished. Your source never contains the annotations.
 
-The implementation uses a temporary HTML copy or a local server that adds annotation markup only to its responses. The original page is not replaced by a separate review report.
+In Codex desktop the agent can open the preview beside the chat. In Claude Code it can provide the URL or use a browser integration you already have. Without a browser tool, it must say that visual placement is unverified. The toolbar supports English and Korean; reasons follow the user's language.
 
-In Codex desktop, a supported browser panel can show the preview beside the chat. In Claude Code or another terminal environment, the agent can use an existing browser integration or give you the local URL. Browser automation is optional; without it, the agent reports that visual verification remains pending. Visible labels follow your language, even though the skill instructions are in English.
+## Try it without an agent
 
-## Try the example
-
-Open [examples/demo.html](examples/demo.html) locally in a browser, or serve only the example directory from the repository root:
+From the installed skill directory (the directory containing this README):
 
 ```sh
-python3 -m http.server 8790 --bind 127.0.0.1 --directory examples
+python3 scripts/preview.py examples/demo.html \
+  --findings examples/findings.json --port 8793
 ```
 
-Open `http://127.0.0.1:8790/demo.html`. Use buttons 1–3 to jump between annotations, resize the window to check wrapping, and open print preview to see the annotations disappear. Stop this example server with Ctrl+C when finished.
+Open `http://127.0.0.1:8793/demo.html`. The example is fictional; the HTML contains no built-in review markers. The same runtime used for your own page draws all three findings, including a quote spanning an inline HTML tag. Resize the browser, try the numbered buttons, and check print preview. Use `--port 0` if the suggested port is busy and open the URL printed by the server.
 
-The example is fictional and self-contained. Python is optional and only used for this example server; the skill does not require a specific server runtime.
+To try editing without changing the installed example, copy the two example files into your own scratch directory. Run the server against that HTML and findings file. Change the first marked sentence, save it, and click **Refresh source**: finding 1 should be withheld as changed while the others remain. **Remove** opens `?review=off`; returning to the original preview URL restores the remaining marks.
 
-## Scope and privacy
+For your own static site:
 
-The initial workflow targets local HTML documents and previews. PDF, Word, and remote websites need an appropriate local review view first. Preview servers bind to `127.0.0.1`; source documents are not uploaded by this skill. Keep private documents, screenshots, temporary previews, and contact details out of this public repository.
+```sh
+python3 /path/to/review-highlight-preview/scripts/preview.py /path/to/site/page.html \
+  --findings /path/to/private/findings.json --root /path/to/site --port 8793
+```
+
+The agent usually writes the small findings JSON for you. [Runtime reference](references/runtime.md) explains its exact-quote format, path mapping, refresh behavior, and troubleshooting.
+
+## Supported inputs and limits
+
+| Input | Support |
+| --- | --- |
+| Local UTF-8 `.html` / `.htm` path or `file://` URL | Supported |
+| Loopback HTTP URL plus `--root` | Maps the URL path to an existing static HTML file; does not proxy the server |
+| Relative styles, images, and links within the static root | Preserved under the new preview origin |
+| Text split across inline tags, whitespace, and line breaks | Exact normalized matching within one unique CSS scope |
+| React / Next.js dev server, SPA routes, hydration | Not validated or claimed as supported |
+| Remote sites, login pages, PDF, Word | Not supported by this runtime |
+| Iframe/shadow-root text, canvas, transformed/clipped layouts | Outside the validated scope |
+
+A new local preview origin displays the source; the original browser tab is not injected or modified. The runtime does not rewrite absolute URLs or `<base>` tags. Existing source scripts and external assets behave normally. CSP-restricted pages may block the overlay; do not weaken the page's policy to force it to run.
+
+Choose the smallest static asset root, since non-hidden files inside it are locally accessible. The server binds only to `127.0.0.1`, disables caching, blocks directory listings and paths outside that root, and does not upload documents. Keep private findings, documents, and screenshots outside this public repository and preferably outside the served root.
+
+## Validation and development
+
+The shared runtime has automated server and Chromium lifecycle tests. See [validation notes](tests/README.md) for exact coverage, host checks, and limitations. Browser presentation and an agent's ability to follow the skill are separate checks; passing one does not prove the other.
+
+```sh
+python3 -m unittest discover -s tests -v
+```
+
+Browser tests are optional developer tooling, not an installation requirement:
+
+```sh
+npm install --no-save --package-lock=false playwright
+npx playwright install chromium
+node tests/browser.cjs
+```
 
 ## Updates and contributions
 
-Inside a Git-cloned installation, run `git pull --ff-only` to update. Review local changes before updating; do not discard them automatically.
+Inside a Git-cloned installation, inspect `git status`, then run `git pull --ff-only`. Preserve local changes; do not reset an existing installation automatically.
 
-Keep the skill small and portable. To propose a change, open an issue or pull request with a fictional example and describe which host environment you checked. Browser presentation was checked in Codex desktop; a full Claude Code agent run has not been performed for the initial release.
+Keep contributions small and source-preserving. Include a fictional reproduction and state which host/browser you checked. Do not add private source material or screenshots to this repository.
 
 ## License
 

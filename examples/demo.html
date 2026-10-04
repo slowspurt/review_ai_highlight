@@ -17,18 +17,10 @@
     h3 { margin:28px 0 8px; font-size:17px; }
     p { margin:0 0 18px; }
     article { margin:56px 0 32px; padding:28px; background:white; }
-    .review-box { position:relative; outline:2px solid var(--orange); outline-offset:8px; border-radius:0; scroll-margin-top:70px; }
-    .review-box::before { content:attr(data-review); position:absolute; top:-31px; left:-10px; min-width:23px; padding:0 4px; background:var(--orange); color:white; font:700 12px/23px system-ui,sans-serif; text-align:center; }
-    .review-group { outline-color:var(--blue); }
-    .review-group::before { background:var(--blue); }
-    p.review-box { margin-top:36px; margin-bottom:28px; }
     .note { color:var(--muted); font-size:14px; }
-    .review-nav { position:fixed; bottom:16px; right:16px; z-index:10; display:flex; flex-wrap:wrap; gap:8px; align-items:center; max-width:calc(100vw - 32px); padding:10px 14px; border:1px solid var(--ink); background:#fffdf7; box-shadow:0 4px 20px #172f2b16; font-size:13px; }
-    .review-nav a { padding:3px 11px; border:1px solid var(--muted); color:var(--ink); text-decoration:none; }
-    .review-nav a:hover,.review-nav a:focus-visible { background:var(--ink); color:white; outline:2px solid var(--blue); outline-offset:2px; }
-    @media(max-width:480px) { body { padding:36px 22px 140px; } article { padding:20px; } .review-nav { left:16px; right:16px; } }
+    @media(max-width:480px) { body { padding:36px 22px 140px; } article { padding:20px; } }
     @media(prefers-reduced-motion:no-preference) { html { scroll-behavior:smooth; } }
-    @media print { body { padding:0; background:white; } article { padding:16px; } .review-box { outline:none !important; } .review-box::before,.review-nav { display:none !important; } }
+    @media print { body { padding:0; background:white; } article { padding:16px; } }
   </style>
 </head>
 <body>
@@ -38,24 +30,16 @@
     <h1>Looks finished.<br>Still hard to follow?</h1>
     <p class="intro">See exactly where to take another look, right on the page you're editing. Keep the surrounding text in view and decide what to change.</p>
   </header>
-  <article class="review-box review-group" id="review-3" data-review="3" aria-label="Finding 3: section structure">
+  <article id="project">
     <h2>Project note: a shared reading list</h2>
     <p>Our team kept book suggestions in several chat threads. I put them in one reading list so we could find them again.</p>
     <h3>How I approached it</h3>
-    <p class="review-box" id="review-1" data-review="1">By bringing the team's recommendations into a shared space that connected individual interests with the wider reading process, I made the list part of how we exchanged ideas.</p>
-    <p class="note">1 — What did I actually make? Several abstract ideas arrive before the reader can picture the work.</p>
+    <p id="approach">By bringing the team's <em>recommendations</em> into a shared space that connected individual interests with the wider reading process, I made the list part of how we exchanged ideas.</p>
     <h3>What happened</h3>
-    <p>I added a title, a short note, and a link for each book. Two teammates tried the list and asked for a way to mark what they had already read.</p>
-    <p class="review-box" id="review-2" data-review="2">This experience reinforced the importance of creating a shared space where recommendations could be brought together and made available to the team.</p>
-    <p class="note">2 — This repeats the opening. Does it add anything the reader needs?</p>
+    <p>I added a title, a short note, and a <a href="#reflection">link</a> for each book. Two teammates tried the list and asked for a way to mark what they had already read.</p>
+    <p id="reflection">This experience reinforced the importance of creating a shared space where recommendations could be brought together and made available to the team.</p>
   </article>
-  <p class="note">3 — The concrete work is easier to understand than the explanation before it. Look at the whole section and decide whether to change the order. This is a fictional example; no edits have been applied.</p>
+  <p class="note">A fictional draft for trying the preview. Edit your own copy and refresh to check the findings again.</p>
 </main>
-<nav class="review-nav" aria-label="Review navigation">
-  <span>Review highlights</span>
-  <a href="#review-1" aria-label="Go to finding 1">1</a>
-  <a href="#review-2" aria-label="Go to finding 2">2</a>
-  <a href="#review-3" aria-label="Go to finding 3">3</a>
-</nav>
 </body>
 </html>
